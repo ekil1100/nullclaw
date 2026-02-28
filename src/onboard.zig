@@ -97,6 +97,7 @@ pub const known_providers = [_]ProviderInfo{
     // --- Tier 4: AI platform specialists ---
     .{ .key = "venice", .label = "Venice", .default_model = "llama-4-70b-instruct", .env_var = "VENICE_API_KEY" },
     .{ .key = "moonshot", .label = "Moonshot (Kimi)", .default_model = "kimi-k2.5", .env_var = "MOONSHOT_API_KEY" },
+    .{ .key = "kimi-code", .label = "Kimi Code (coding endpoint)", .default_model = "kimi-k2.5", .env_var = "KIMI_API_KEY" },
     .{ .key = "synthetic", .label = "Synthetic", .default_model = "synthetic-model", .env_var = "SYNTHETIC_API_KEY" },
     .{ .key = "opencode-zen", .label = "OpenCode Zen", .default_model = "opencode-model", .env_var = "OPENCODE_API_KEY" },
     .{ .key = "minimax", .label = "MiniMax", .default_model = "minimax-m2.1", .env_var = "MINIMAX_API_KEY" },
@@ -1269,6 +1270,7 @@ pub fn runWizard(allocator: std.mem.Allocator) !void {
 
     // ── Step 5: Tunnel ──
     try out.writeAll("  Step 5/8: Tunnel\n");
+    try out.writeAll("    (Only needed for webhook-style inbound callbacks. WebSocket channels usually do not require this.)\n");
     try out.writeAll("    [1] none\n    [2] cloudflare\n    [3] ngrok\n    [4] tailscale\n");
     try out.writeAll("  Choice [1]: ");
     const tunnel_idx = promptChoice(out, &input_buf, tunnel_options.len, 0) orelse {
@@ -2672,7 +2674,7 @@ test "catalog_providers names are unique" {
 test "wizard promptChoice returns default for out-of-range" {
     // This tests the logic without actual I/O by validating the
     // boundary: max providers is known_providers.len
-    try std.testing.expect(known_providers.len == 30);
+    try std.testing.expect(known_providers.len == 31);
     // The wizard would clamp to default (0) for out of range input
 }
 

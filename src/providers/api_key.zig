@@ -93,6 +93,7 @@ fn providerEnvCandidates(name: []const u8) [3][]const u8 {
         .{ "poe", .{ "POE_API_KEY", "", "" } },
         .{ "moonshot", .{ "MOONSHOT_API_KEY", "", "" } },
         .{ "kimi", .{ "MOONSHOT_API_KEY", "", "" } },
+        .{ "kimi-code", .{ "KIMI_API_KEY", "MOONSHOT_API_KEY", "" } },
         .{ "bedrock", .{ "AWS_ACCESS_KEY_ID", "", "" } },
         .{ "aws-bedrock", .{ "AWS_ACCESS_KEY_ID", "", "" } },
         .{ "cloudflare", .{ "CLOUDFLARE_API_TOKEN", "", "" } },

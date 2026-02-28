@@ -118,10 +118,13 @@ const compat_providers = [_]CompatProvider{
 
     // ── Coding-specific endpoints ─────────────────────────────────────────
     .{ .name = "kimi-code", .url = "https://api.kimi.com/coding/v1", .display = "Kimi Code" },
-    .{ .name = "kimi_coding", .url = "https://api.kimi.com/coding/v1", .display = "Kimi Code" },
     .{ .name = "volcengine-plan", .url = "https://ark.cn-beijing.volces.com/api/coding/v3", .display = "Doubao" },
     .{ .name = "byteplus-plan", .url = "https://ark.ap-southeast.bytepluses.com/api/coding/v3", .display = "BytePlus" },
     .{ .name = "qwen-portal", .url = "https://portal.qwen.ai/v1", .display = "Qwen Portal" },
+    .{ .name = "minimax-plan", .url = "https://api.minimax.io/v1", .display = "MiniMax Coding Plan", .no_responses_fallback = true, .merge_system_into_user = true },
+    .{ .name = "minimax-coding", .url = "https://api.minimax.io/v1", .display = "MiniMax Coding Plan", .no_responses_fallback = true, .merge_system_into_user = true },
+    .{ .name = "minimax-plan-cn", .url = "https://api.minimaxi.com/v1", .display = "MiniMax Coding Plan CN", .no_responses_fallback = true, .merge_system_into_user = true },
+    .{ .name = "minimax-coding-cn", .url = "https://api.minimaxi.com/v1", .display = "MiniMax Coding Plan CN", .no_responses_fallback = true, .merge_system_into_user = true },
 
     // ── Infrastructure & Cloud ────────────────────────────────────────────
     .{ .name = "bedrock", .url = "https://bedrock-runtime.us-east-1.amazonaws.com", .display = "Amazon Bedrock" },
@@ -431,6 +434,36 @@ test "compatibleProviderUrl CN/intl variants" {
     try std.testing.expectEqualStrings("https://api.minimax.io/v1", compatibleProviderUrl("minimax-intl").?);
 }
 
+test "minimax coding plan providers resolve correctly" {
+    // International endpoints
+    try std.testing.expectEqualStrings("https://api.minimax.io/v1", compatibleProviderUrl("minimax-plan").?);
+    try std.testing.expectEqualStrings("https://api.minimax.io/v1", compatibleProviderUrl("minimax-coding").?);
+    try std.testing.expectEqualStrings("MiniMax Coding Plan", compatibleProviderDisplayName("minimax-plan"));
+    try std.testing.expectEqualStrings("MiniMax Coding Plan", compatibleProviderDisplayName("minimax-coding"));
+
+    // CN endpoints
+    try std.testing.expectEqualStrings("https://api.minimaxi.com/v1", compatibleProviderUrl("minimax-plan-cn").?);
+    try std.testing.expectEqualStrings("https://api.minimaxi.com/v1", compatibleProviderUrl("minimax-coding-cn").?);
+    try std.testing.expectEqualStrings("MiniMax Coding Plan CN", compatibleProviderDisplayName("minimax-plan-cn"));
+    try std.testing.expectEqualStrings("MiniMax Coding Plan CN", compatibleProviderDisplayName("minimax-coding-cn"));
+
+    // All should be compatible providers
+    try std.testing.expect(classifyProvider("minimax-plan") == .compatible_provider);
+    try std.testing.expect(classifyProvider("minimax-coding") == .compatible_provider);
+    try std.testing.expect(classifyProvider("minimax-plan-cn") == .compatible_provider);
+    try std.testing.expect(classifyProvider("minimax-coding-cn") == .compatible_provider);
+}
+
+test "minimax coding plan providers have correct flags" {
+    const plan = findCompatProvider("minimax-plan").?;
+    try std.testing.expect(plan.no_responses_fallback);
+    try std.testing.expect(plan.merge_system_into_user);
+
+    const plan_cn = findCompatProvider("minimax-plan-cn").?;
+    try std.testing.expect(plan_cn.no_responses_fallback);
+    try std.testing.expect(plan_cn.merge_system_into_user);
+}
+
 test "nvidia resolves to correct URL" {
     try std.testing.expectEqualStrings("https://integrate.api.nvidia.com/v1", compatibleProviderUrl("nvidia").?);
 }
@@ -604,5 +637,5 @@ test "ProviderHolder.fromConfig routes to correct variant" {
 
 test "compat_providers table count" {
     // Verify we have the expected number of entries (guard against accidental deletions).
-    try std.testing.expect(compat_providers.len >= 88);
+    try std.testing.expect(compat_providers.len >= 91);
 }
